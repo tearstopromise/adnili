@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+  <link rel="stylesheet" type="text/css" href="css/jquery.mobile.flatui.css" />
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile-1.4.0.min.js"></script>
+    <script src="js/jquery.timeago.js" type="text/javascript"></script>
+	<script type="text/javascript" src="phonegap.js"></script>
+    <script type="text/javascript" src="camera.js"></script>
+	
+  <style>
+	p {text-indent:30px;}
+  .feedRow{
+  display:none;
+  }
+
+  </style>
+</head>
+<body>
+
+    <div data-role="page" id="mainPage">
+        <div data-role="header" data-position="relative">
+         
+<a href="#mypanel" data-icon="grid" data-iconpos="notext" data-theme="b" data-inline="true" data-role="button">left</a>
+            <h1>iLinda</h1>
+			            <div data-role="navbar">
+                <ul>
+					
+                    <li><a href="" data-transition="slide" data-theme="b" data-icon="info">City</a></li>
+					 <li><a href="#contactus"  data-transition="slide" data-icon="phone">Nation</a></li>
+					 <li><a href="#About"  data-transition="slide" data-icon="star">Settings</a></li>
+                    
+                </ul>
+            </div>
+			<a href="#mypanel" data-icon="grid" data-iconpos="notext" data-theme="b" data-inline="true" data-role="button">right</a>
+
+        </div>
+        <div data-role="content">
+          				<div id="datadiv">
+		<div class="ui-body ui-body-e" ><center>
+			Talking to iLinda
+			</center>
+			</div>
+			</div>
+
+        </div>
+       
+        <div data-role="footer" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+					
+                    <li><a href="" data-transition="slide" data-theme="b" data-icon="info">Report</a></li>
+					 
+                    
+                </ul>
+            </div>
+        </div>
+		 <!--Left Panel-->
+
+        <div data-role="panel" id="mypanel" data-display="reveal" id="mypanel">
+			
+
+			
+            <ul data-role="listview" data-theme="a">
+					<li data-role="list-divider" data-theme="a"></li>
+					<li data-role="list-divider" data-theme="a">
+				 <div id="paneluserinfo" style="text-align:right;"></div>
+				 </li>
+				<li data-role="list-divider" data-theme="a"></li>
+				<li data-role="list-divider" data-theme="c"></li>
+                <li data-role="list-divider" data-theme="b">Quick Menu</li>
+				<li data-role="list-divider" data-theme="c"></li>
+
+				<li id="btn-home" class="inBar"><a href="">Home</a></li>
+				<li id="btn-addbuildingdata" class="inBar"><a href="#newannouncementdialog">Add Announcement</a></li>
+                
+				<li id="o1-p" class="inBar"><a href="" id="btn-logout">Logout</a></li>
+		
+           
+
+            </ul>
+  
+
+       
+    </div>
+	
+	
+	    </div>
+ 
+				<div id="newannouncementdialog" data-role="dialog" data-title="New Feed" data-theme="a">
+		<div data-role="header" data-theme="b">
+			<h1>New Feed</h1>
+		</div>
+	<div data-role="content">	
+			<label>Feed Title:</label>
+			<input type = "text" id = "title"/>
+			<label>Details:</label>
+			<textarea id="details"></textarea>
+			<label>By:</label>
+			<input type="text" id="uname" disabled/>
+			
+			
+			
+			<a id="btn-post" data-rel="back" data-role="button" data-theme="b">Broadcast</a>
+				
+	</div>
+
+</div>
+   
+	
+
+	<script>
+jQuery(document).ready(function() {
+  jQuery("abbr.timeago").timeago();
+  jQuery.timeago.settings.allowFuture = true;
+});
+ $('#uname').val(localStorage.getItem("username"));
+$("#paneluserinfo").html(localStorage.getItem("username") + "<br />" +localStorage.getItem("unit_id") + "<br />" + localStorage.getItem("designationOffice"));
+  $.ajax({
+							url: "php/feed.php",
+							type: "POST",
+							dataType: "json",
+							success: function(data){
+
+					$("#datadiv").html("<table style='width:100%' id='mytable' ></table>");
+				
+					for(var i=0;i<data.length;i++){			//fetch some data baybeh!		
+						 $('#mytable').append('<tr class="feedRow" id="f'+ i + '"><td class="getBuildingId"><div class="ui-body ui-body-d" ><center><b>' + data[i].title + '</b><br/><small>by: '+ data[i].poster +'</small></center><br />' + data[i].details +'<br/><div style="text-align:right;"><small><abbr class="timeago" title="'+ data[i].datetime +'"></abbr></small></div></div></td></tr>');
+					}
+					$( "#searchpanel" ).panel( "close" );
+					$.mobile.loading('hide');
+					for(var i=0;i<5;i++){	
+					$('#f' + i ).fadeToggle(i * 800);
+					}
+					 jQuery("abbr.timeago").timeago();
+				}
+				});
+				
+				
+				
+					
+			
+var showvariable = 11 ;			
+		
+  $("#btn-showmore").click(function () {
+  	for(var i=1;i<10;i++){	
+	$('#f' + showvariable ).fadeToggle(i * 450);
+	showvariable ++ ;
+
+	}
+	document.getElementById("btn-showmore").scrollIntoView();
+  });		
+  
+
+$("#btn-post").click(function () {
+
+	 		$.mobile.loading('show', {
+	 			text: 'Connecting to Server',
+	 			textVisible: true,
+	 			theme: 'a'
+	 		});
+
+
+	 		var a = $("#uname").val();
+	 		var b = $("#title").val();
+	 		var c = $("#details").val();
+		
+	
+	 		$.ajax({
+	 			url: "edm_online_files/addfeed.php",
+	 			type: "POST",
+	 			data: { "username": a, "title": b, "details": c},
+	 			success: function (data) {
+
+	 			 if (data == "success") {
+	 				
+
+	 					$.mobile.loading('hide');
+	 					$("#txtNotif").html("Announcement Broadcasted!");
+	 					$("#popupNotif").popup("open");
+						setTimeout(function(){location.reload()},1500);
+
+	 				}
+	 				else {
+
+	 					$.mobile.loading('hide');
+	 					$("#txtNotif").html("There was a problem with the connection. Please try again.");
+	 					$("#popupNotif").popup("open");
+	 				}
+
+
+	 			}
+	 		});
+	 	});
+		
+		  app.initialize();
+	</script>
+	
+</body>
+</html>
